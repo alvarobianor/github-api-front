@@ -11,8 +11,8 @@ export default createGlobalStyle`
   }
 
   body{
-    background-color: #F0F0F5;
-    background: url(${githubBackground}) no-repeat 70% top;
+    /* background-color: lightgray; */
+    background: #f0f0f5 url(${githubBackground}) no-repeat 70% top;
     -webkit-font-smoothing: antialiased;
   }
 
