@@ -1,23 +1,66 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 
 import { FiChevronRight } from 'react-icons/fi';
 
 import imgLogo from '../../assets/dashboard-logo.svg';
 
+import api from '../../service/api';
+
 // last thing to import
 import { Title, Form, Repositories } from './styles';
 
+interface RepositoryDTO {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [repositories, setRepositories] = useState<RepositoryDTO[]>([]);
+
+  async function AddRepositori(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault(); // dont refresh the page when submit
+
+    const service = await api.get<RepositoryDTO>(`/repos/${newRepo}`);
+
+    const repository = service.data;
+    setRepositories([...repositories, repository]);
+    setNewRepo('');
+
+    console.log(repository);
+  }
+
   return (
     <>
       <img src={imgLogo} alt="Github Logo" />
       <Title>Explore repositórios no GitHub :D</Title>
-      <Form>
-        <input placeholder="Digite aqui" />
+      <Form onSubmit={AddRepositori}>
+        <input
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.currentTarget.value)}
+          placeholder="Digite aqui"
+        />
         <button type="submit">Pesquisar</button>
       </Form>
-
       <Repositories>
+        {repositories.map((res) => (
+          <a key={res.full_name} href="teste">
+            <img src={res.owner.avatar_url} alt="Álvaro Bianor" />
+            <div>
+              <strong>{res.full_name}</strong>
+              <p>{res.description}</p>
+            </div>
+            <FiChevronRight size={40} />
+          </a>
+        ))}
+      </Repositories>
+
+      {/* <Repositories>
         <a href="teste">
           <img
             src="https://avatars3.githubusercontent.com/u/19610639?s=460&u=beeb3184574cb7862579a00ccfe2dfc935b6f00e&v=4"
@@ -27,34 +70,9 @@ const Dashboard: React.FC = () => {
             <strong>alvarobianor/cursomc</strong>
             <p>Curso de Java FullStack</p>
           </div>
-          <FiChevronRight size={20} />
+          <FiChevronRight size={40} />
         </a>
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/40062831?s=460&u=725b18e6089c126558a6178a66440a6222b2a112&v=4"
-            alt="Letícia Farias"
-          />
-          <div>
-            <strong>LeticiaFarias/FBD</strong>
-            <p>Fundamentos de banco de dados</p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-
-        <a href="teste">
-          <img
-            src="https://avatars2.githubusercontent.com/u/5387202?s=460&u=0306cf399e36a360d9cbc0ca3815eb003723974d&v=4"
-            alt="Emerson Vieira"
-          />
-          <div>
-            <strong>mensonones/QueroWorkar</strong>
-            <p>
-              App que disponibiliza a visualização das vagas do site QueroWorkar
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-      </Repositories>
+      </Repositories> */}
     </>
   );
 };

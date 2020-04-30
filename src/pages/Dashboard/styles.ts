@@ -71,6 +71,10 @@ export const Repositories = styled.div`
       margin-top: 20px;
     }
 
+    /* ^^^^
+    when you have a list with elements that aren't expecific
+    elements of a traditional list and you wnat aplly avery style in the second and above */
+
     img {
       width: 64px;
       height: 64px;
@@ -79,6 +83,7 @@ export const Repositories = styled.div`
 
     div {
       margin-left: 20px;
+      flex: 1;
 
       strong {
         font-size: 20px;
