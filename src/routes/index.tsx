@@ -10,7 +10,9 @@ const Routes: React.FC = () => (
     <Switch>
       <Route path="/" exact component={Dashboard} />
       <Route path="/dashboard" exact component={Dashboard} />
-      <Route path="/repository" component={Repository} />
+      <Route path="/repositories/:repository+" component={Repository} />
+      {/* When you have a parem taht includes "/", for to be
+      understended as part of tes, we can use "+" in the final of string */}
     </Switch>
   </>
 );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-
+import { Link } from 'react-router-dom';
 import { FiChevronRight } from 'react-icons/fi';
 
 import imgLogo from '../../assets/dashboard-logo.svg';
@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
 
       const repository = service.data;
       const alredyExists = repositories.filter((e) => e.id === repository.id);
-      console.log(alredyExists);
+
       if (alredyExists.length !== 0) {
         setInputError('Repository alredy exists!');
         setNewRepo('');
@@ -85,30 +85,16 @@ const Dashboard: React.FC = () => {
       {inputError && <Error>{inputError}</Error>}
       <Repositories>
         {repositories.map((res) => (
-          <a key={res.full_name} href="teste">
+          <Link key={res.full_name} to={`/repositories/${res.full_name}`}>
             <img src={res.owner.avatar_url} alt="Álvaro Bianor" />
             <div>
               <strong>{res.full_name}</strong>
               <p>{res.description}</p>
             </div>
             <FiChevronRight size={40} />
-          </a>
+          </Link>
         ))}
       </Repositories>
-
-      {/* <Repositories>
-        <a href="teste">
-          <img
-            src="https://avatars3.githubusercontent.com/u/19610639?s=460&u=beeb3184574cb7862579a00ccfe2dfc935b6f00e&v=4"
-            alt="Álvaro Bianor"
-          />
-          <div>
-            <strong>alvarobianor/cursomc</strong>
-            <p>Curso de Java FullStack</p>
-          </div>
-          <FiChevronRight size={40} />
-        </a>
-      </Repositories> */}
     </>
   );
 };
