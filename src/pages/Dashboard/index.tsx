@@ -7,7 +7,7 @@ import imgLogo from '../../assets/dashboard-logo.svg';
 import api from '../../service/api';
 
 // last thing to import
-import { Title, Form, Repositories } from './styles';
+import { Title, Form, Repositories, Error } from './styles';
 
 interface RepositoryDTO {
   full_name: string;
@@ -18,6 +18,7 @@ interface RepositoryDTO {
   };
 }
 const Dashboard: React.FC = () => {
+  const [inputError, setInputError] = useState('');
   const [newRepo, setNewRepo] = useState('');
   const [repositories, setRepositories] = useState<RepositoryDTO[]>([]);
 
@@ -26,20 +27,28 @@ const Dashboard: React.FC = () => {
   ): Promise<void> {
     event.preventDefault(); // dont refresh the page when submit
 
-    const service = await api.get<RepositoryDTO>(`/repos/${newRepo}`);
+    try {
+      if (!newRepo) {
+        setInputError(`Digit the author/repository in the label`);
+        return;
+      }
 
-    const repository = service.data;
-    setRepositories([...repositories, repository]);
-    setNewRepo('');
+      const service = await api.get<RepositoryDTO>(`/repos/${newRepo}`);
 
-    console.log(repository);
+      const repository = service.data;
+      setRepositories([...repositories, repository]);
+      setNewRepo('');
+      setInputError('');
+    } catch (err) {
+      setInputError(`This repository doesn't exists`);
+    }
   }
 
   return (
     <>
       <img src={imgLogo} alt="Github Logo" />
       <Title>Explore repositórios no GitHub :D</Title>
-      <Form onSubmit={AddRepositori}>
+      <Form hasError={!!inputError} onSubmit={AddRepositori}>
         <input
           value={newRepo}
           onChange={(e) => setNewRepo(e.currentTarget.value)}
@@ -47,6 +56,8 @@ const Dashboard: React.FC = () => {
         />
         <button type="submit">Pesquisar</button>
       </Form>
+
+      {inputError && <Error>{inputError}</Error>}
       <Repositories>
         {repositories.map((res) => (
           <a key={res.full_name} href="teste">
