@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 
 import { FiChevronRight } from 'react-icons/fi';
 
@@ -10,6 +10,7 @@ import api from '../../service/api';
 import { Title, Form, Repositories, Error } from './styles';
 
 interface RepositoryDTO {
+  id: number;
   full_name: string;
   description: string;
   owner: {
@@ -20,7 +21,22 @@ interface RepositoryDTO {
 const Dashboard: React.FC = () => {
   const [inputError, setInputError] = useState('');
   const [newRepo, setNewRepo] = useState('');
-  const [repositories, setRepositories] = useState<RepositoryDTO[]>([]);
+  const [repositories, setRepositories] = useState<RepositoryDTO[]>(() => {
+    const savedRepositories = localStorage.getItem(
+      `@githubExplore: Repositories`,
+    );
+    if (savedRepositories) {
+      return JSON.parse(savedRepositories);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      `@githubExplore: Repositories`,
+      JSON.stringify(repositories),
+    );
+  }, [repositories]);
 
   async function AddRepositori(
     event: FormEvent<HTMLFormElement>,
@@ -30,17 +46,26 @@ const Dashboard: React.FC = () => {
     try {
       if (!newRepo) {
         setInputError(`Digit the author/repository in the label`);
+        setNewRepo('');
         return;
       }
 
       const service = await api.get<RepositoryDTO>(`/repos/${newRepo}`);
 
       const repository = service.data;
+      const alredyExists = repositories.filter((e) => e.id === repository.id);
+      console.log(alredyExists);
+      if (alredyExists.length !== 0) {
+        setInputError('Repository alredy exists!');
+        setNewRepo('');
+        return;
+      }
       setRepositories([...repositories, repository]);
       setNewRepo('');
       setInputError('');
     } catch (err) {
       setInputError(`This repository doesn't exists`);
+      setNewRepo('');
     }
   }
 
